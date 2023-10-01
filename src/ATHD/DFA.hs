@@ -19,10 +19,13 @@ module ATHD.DFA
 -- DFA Validity Checking
 , DFACorrectness
 , checkCorrectDFA
+-- DFA Word Checking
+, checkWordDFA
 )
 where
 
 import Data.List (nub, sort, intercalate)
+import Data.Maybe (maybe, isJust, isNothing, fromJust)
 
 -- Types
 type Input a = [a]
@@ -128,3 +131,28 @@ checkCorrectDFA dfa
   where
     allChecks = [invalidTransitionStatesDFA dfa, invalidTransitionSymbolsDFA dfa, invalidStartStateDFA dfa, invalidAcceptStatesDFA dfa, nondeterministicDFA dfa]
     issues = filter (/= Correct) allChecks
+
+-- DFA Word Checking
+checkWordDFA :: (Eq a, Eq b) => DFA a b -> [b] -> Bool
+checkWordDFA dfa word
+  | isNothing mqf  = False
+  | otherwise      = fst (fromJust mqf) `elem` acceptStatesDFA dfa
+  where
+    mqf = simulateDFA dfa (startStateDFA dfa) word
+
+simulateDFA :: (Eq a, Eq b) => DFA a b -> a -> [b] -> Maybe (a, [b])
+simulateDFA dfa q0 word
+  = until ended doStep $ Just (q0, word)
+  where
+    ended :: Maybe (a, [b]) -> Bool
+    ended Nothing = True
+    ended (Just (_, word)) = null word
+    doStep = maybe Nothing (stepDFA dfa)
+
+stepDFA :: (Eq a, Eq b) => DFA a b -> (a, [b]) -> Maybe (a, [b])
+stepDFA _ (q, []) = Just (q, [])
+stepDFA dfa (q, (s:ss))
+  | null transitions  = Nothing
+  | otherwise         = Just (tOut $ head transitions, ss)
+  where
+    transitions = filter ((==(q,s)) . tInSymbol) $ transitionsDFA dfa
