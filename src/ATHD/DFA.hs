@@ -1,10 +1,11 @@
 module ATHD.DFA
 
--- DFA.hs (Deterministic Finite Automaton)
+---------------------------------------------
+-- DFA.hs (Deterministic Finite Automaton) --
+---------------------------------------------
 
 -- Types
-( Input
-, Transition
+( Transition
 , DFA
 -- DFA Getters
 , statesDFA
@@ -16,7 +17,7 @@ module ATHD.DFA
 , tIn
 , tOut
 , tSymbol
--- DFA Validity Checking
+-- DFA Correctness Checking
 , DFACorrectness
 , checkCorrectDFA
 -- DFA Word Checking
@@ -27,14 +28,19 @@ where
 import Data.List (nub, sort, intercalate)
 import Data.Maybe (maybe, isJust, isNothing, fromJust)
 
--- Types
-type Input a = [a]
+-----------
+-- Types --
+-----------
+
 -- ((q1,s),q2) represents a directed edge from 'q1' to 'q2' with symbol 's'
 type Transition a b = ((a, b), a)
 -- (qs,ss,ts,q0,as) represents a DFA with state names 'qs', symbols 'ss', transitions 'ts', start state 'q0', accept states 'as'
 type DFA a b = ([a], [b], [Transition a b], a, [a])
 
--- DFA Getters
+-----------------
+-- DFA Getters --
+-----------------
+
 statesDFA :: DFA a b -> [a]
 statesDFA (qs, _, _, _, _) = qs
 
@@ -50,7 +56,10 @@ startStateDFA (_, _, _, q0, _) = q0
 acceptStatesDFA :: DFA a b -> [a]
 acceptStatesDFA (_, _, _, _, as) = as
 
--- Transition Getters
+------------------------
+-- Transition Getters --
+------------------------
+
 tIn :: Transition a b -> a
 tIn ((q1,_),_) = q1
 
@@ -63,7 +72,10 @@ tSymbol ((_,s),_) = s
 tInSymbol :: Transition a b -> (a,b)
 tInSymbol ((q1,s),_) = (q1,s)
 
--- DFA Validity Checking
+------------------------------
+-- DFA Correctness Checking --
+------------------------------
+
 data DFACorrectness a b
   = Correct
   | InvalidTransitionStates [a]
@@ -132,7 +144,10 @@ checkCorrectDFA dfa
     allChecks = [invalidTransitionStatesDFA dfa, invalidTransitionSymbolsDFA dfa, invalidStartStateDFA dfa, invalidAcceptStatesDFA dfa, nondeterministicDFA dfa]
     issues = filter (/= Correct) allChecks
 
--- DFA Word Checking
+-----------------------
+-- DFA Word Checking --
+-----------------------
+
 checkWordDFA :: (Eq a, Eq b) => DFA a b -> [b] -> Bool
 checkWordDFA dfa word
   | isNothing mqf  = False
