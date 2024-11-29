@@ -1,4 +1,4 @@
-module CFG
+module FiniteAutomata.Automata.ContextFreeGrammar.CFG
 
 ( CFG
 , CFGRule
@@ -12,7 +12,7 @@ module CFG
 )
 where
 
-import ArraySplit
+import FiniteAutomata.Util.ArraySplit
 
 --
 -- CFG.hs types

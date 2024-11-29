@@ -1,4 +1,4 @@
-module ArraySplit
+module FiniteAutomata.Util.ArraySplit
 
 ( ArraySplit
 , tryArraySplitIterate
