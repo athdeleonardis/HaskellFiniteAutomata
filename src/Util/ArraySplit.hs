@@ -3,6 +3,7 @@ module FiniteAutomata.Util.ArraySplit
 ( ArraySplit
 , tryArraySplitIterate
 , tryArraySplit
+, arraySplitValue
 )
 where
 
@@ -17,3 +18,6 @@ tryArraySplit :: [a] -> Maybe (ArraySplit a)
 tryArraySplit arr
   | length arr == 0  = Nothing
   | otherwise        = Just ([], head arr, tail arr)
+
+arraySplitValue :: ArraySplit a -> a
+arraySplitValue (_,v,_) = v

@@ -14,6 +14,7 @@ data CFGCorrectness a
   | InvalidStartVariable a
   | InvalidVariables [a]
   | InvalidExpansions [[a]]
+  | InvalidVariablesNoRules [a]
   | MultipleIssues [CFGCorrectness a]
   deriving Eq
 
@@ -23,6 +24,7 @@ instance (Show a) => Show (CFGCorrectness a) where
   show (InvalidStartVariable v0) = "Incorrect start variable: " ++ show v0
   show (InvalidVariables vs) = "Incorrect rule variables: " ++ show vs
   show (InvalidExpansions es) = "Incorrect rule expansions: " ++ show es
+  show (InvalidVariablesNoRules vs) = "Incorrect variables have no rules: " ++ show vs
   show (MultipleIssues is) = intercalate "\n- " ("Multiple issues:" : map show is)
 
 cfgOverlappingSymbols :: Eq a => CFG a -> CFGCorrectness a
@@ -58,11 +60,19 @@ cfgInvalidExpansions cfg
     isBad str = length (filter (not . isSymbol) str) /= 0
     badExps = filter isBad $ map snd $ cfgRules cfg
 
+cfgInvalidVariablesNoRules :: Eq a => CFG a -> CFGCorrectness a
+cfginvalidVariablesNoRules cfg
+  | length bqs == 0  = Correct
+  | otherwise        = InvalidVariablesNoRules bqs
+  where
+    hasNoRules v = (==0) $ length $ cfgVariableRules cfg v
+    bqs = filter hasNoRules $ cfgVariables cfg
+
 cfgCorrectness :: Eq a => CFG a -> CFGCorrectness a
 cfgCorrectness cfg
   | numIssues == 0  = Correct
   | numIssues == 1  = head issues
   | otherwise       = MultipleIssues issues
   where
-    issues = filter (/= Correct) [cfgOverlappingSymbols cfg, cfgInvalidStartVariable cfg, cfgInvalidVariables cfg, cfgInvalidExpansions cfg]
+    issues = filter (/= Correct) [cfgOverlappingSymbols cfg, cfgInvalidStartVariable cfg, cfgInvalidVariables cfg, cfgInvalidExpansions cfg, cfgInvalidVariablesNoRules cfg]
     numIssues = length issues

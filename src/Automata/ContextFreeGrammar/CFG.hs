@@ -68,9 +68,9 @@ conditionalExpandAllInternal cnd expander (priors, v, posts) =
 
 -- |Take an array of strings and iterate them using the rules of the context free grammar
 cfgIterate :: Eq a => CFG a -> [[a]] -> [[a]]
-cfgIterate cfg strs = concat $ map (conditionalExpandAll notTerminal (allPosts cfg)) strs
+cfgIterate cfg strs = concat $ map (conditionalExpandAll (not . isTerminal) (allPosts cfg)) strs
   where
-    notTerminal v = length (filter (==v) $ cfgTerminals cfg) == 0
+    isTerminal v = v `elem` (cfgTerminals cfg)
 
 -- |Start from the context free grammar's starting variable, and iterate N times
 cfgIterateN :: Eq a => CFG a -> Int -> [[a]]

@@ -35,3 +35,6 @@ cabal.project.local~
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+# windows build
+*.exe
