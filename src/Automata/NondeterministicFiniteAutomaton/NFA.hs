@@ -18,7 +18,8 @@ module FiniteAutomata.Automata.NondeterministicFiniteAutomaton.NFA
 -- NFA Functions
 , nfaStep
 , nfaSimulate
-, nfaStringCheck
+, nfaInitialState
+, nfaCheckString
 )
 where
 
@@ -68,13 +69,13 @@ nfaTransitionEndsFromKey nfa symbol state = map transitionOut $ filter matchesKe
     matchesKey = (==key) . fst
 
 nfaStep :: (Eq a, Ord a, Eq b) => NFA a b -> [a] -> b -> [a]
-nfaStep nfa states symbol = nub $ sort $ nfaStepSilent nfa $ nfaStepNonSilent nfa states symbol
+nfaStep nfa states symbol = nfaStepSilent nfa $ nfaStepNonSilent nfa states symbol
 
 nfaStepNonSilent :: (Eq a, Ord a, Eq b) => NFA a b -> [a] -> b -> [a]
 nfaStepNonSilent nfa states symbol = nub $ sort $ concat $ map (nfaTransitionEndsFromKey nfa symbol) states
 
 nfaStepSilent :: (Eq a, Ord a, Eq b) => NFA a b -> [a] -> [a]
-nfaStepSilent nfa states = nfaStepSilentInternal nfa states [] states
+nfaStepSilent nfa states = nub $ sort $ nfaStepSilentInternal nfa states [] states
 
 nfaStepSilentInternal :: (Eq a, Ord a, Eq b) => NFA a b -> [a] -> [a] -> [a] -> [a]
 nfaStepSilentInternal _ states _ [] = states
@@ -92,5 +93,8 @@ nfaSimulate nfa (s:ss) qs = nfaSimulate nfa ss (nfaStep nfa qs s)
 nfaStateIsAccept :: Eq a => NFA a b -> [a] -> Bool
 nfaStateIsAccept nfa qs = any (`elem` (nfaAcceptStates nfa)) qs
 
-nfaStringCheck :: (Eq a, Ord a, Eq b) => NFA a b -> [b] -> Bool
-nfaStringCheck nfa str = nfaStateIsAccept nfa $ nfaSimulate nfa str $ nfaStepSilent nfa $ nfaStartStates nfa
+nfaInitialState :: (Eq a, Ord a, Eq b) => NFA a b -> [a]
+nfaInitialState nfa = nfaStepSilent nfa $ nfaStartStates nfa
+
+nfaCheckString :: (Eq a, Ord a, Eq b) => NFA a b -> [b] -> Bool
+nfaCheckString nfa str = nfaStateIsAccept nfa $ nfaSimulate nfa str $ nfaInitialState nfa

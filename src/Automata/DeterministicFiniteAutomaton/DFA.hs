@@ -25,7 +25,7 @@ import FiniteAutomata.Util.Transition
 --
 
 -- (qs,ss,ts,q0,as) represents a DFA with state names 'qs', symbols 'ss', transitions 'ts', start state 'q0', accept states 'as'
-type DFA a b = ([a], [b], [Transition a b], a, [a]) 
+type DFA a b = ([a], [b], [Transition a b], a, [a])
 
 --
 -- DFA.hs functions
