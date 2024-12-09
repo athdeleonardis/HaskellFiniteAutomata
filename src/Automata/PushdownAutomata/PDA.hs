@@ -12,10 +12,9 @@ module FiniteAutomata.Automata.PushdownAutomata.PDA
 , pdaStartState
 , pdaStartStackSymbol
 , pdaAcceptanceCriteria
+, pdaApplyRuleValue
 )
 where
-
-import Data.List (find)
 
 -- |PDARuleKey. (q, a, A) represents a PDARuleKey with prior state 'q', input symbol 'a' and stack symbol to pop 'A'.
 type PDARuleKey a b = (a, b, b)
@@ -55,3 +54,6 @@ pdaStartStackSymbol (_,_,_,_,_,_,s0,_) = s0
 
 pdaAcceptanceCriteria :: PDA a b -> PDAAccept a
 pdaAcceptanceCriteria (_,_,_,_,_,_,_,a) = a
+
+pdaApplyRuleValue :: PDAState a b -> PDARuleValue a b -> PDAState a b
+pdaApplyRuleValue (_, s:ss) (qn, ssn) = (qn, ssn ++ ss)
